@@ -3,7 +3,6 @@ import pool from "../config/databases/db.js";
 const getUsers = async () => {
   try {
     const [rows] = await pool.query("SELECT * FROM users");
-    // console.log(rows, "at model");
     return rows;
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -29,6 +28,7 @@ const findUserByEmail = async (email) => {
     const [rows] = await pool.query("SELECT * FROM users WHERE email = ?", [
       email,
     ]);
+    // console.log(rows, "at User.js");
     return rows[0]; // Return the first matching user
   } catch (error) {
     console.error("Error finding user by email:", error);
@@ -36,6 +36,4 @@ const findUserByEmail = async (email) => {
   }
 };
 
-// const a = await getUsers();
-// console.log(a, "at User.js");
 export { createUser, getUsers, findUserByEmail };

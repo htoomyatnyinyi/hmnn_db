@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 // import app from "./app.js";
-import server from "./server.js";
+import app from "./app.js";
 import pool from "./src/config/databases/db.js";
 
 dotenv.config();
@@ -16,7 +16,7 @@ const startServer = async () => {
     );
     connection.release(); // Release the connection back to the pool
     // Start the server
-    server.listen(PORT, () => {
+    app.listen(PORT, () => {
       console.log(`SERVER_IS_RUNNING_ON_PORT: ${PORT}`);
     });
   } catch (err) {
