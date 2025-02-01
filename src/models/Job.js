@@ -25,9 +25,7 @@ const createJob = async (title, description) => {
 
 const findJobById = async (id) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM jobs WHERE job_id = ?", [
-      id,
-    ]);
+    const [rows] = await pool.query("SELECT * FROM jobs WHERE id = ?", [id]);
     return rows[0]; // Return the first matching job
   } catch (error) {
     console.error("Error finding job by id:", error);
@@ -35,7 +33,11 @@ const findJobById = async (id) => {
   }
 };
 
-export { getJobs, createJob };
+// const a = await getJobs();
+// const b= await findJobById(1);
+// console.log(a,b);
+
+export { getJobs, createJob, findJobById };
 
 // // ### GEMINI GENREATE
 // const Job = require('../models/Job');

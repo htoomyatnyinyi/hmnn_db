@@ -37,7 +37,7 @@ const login = async (req, res) => {
     });
     // Store user data in the session
     req.session.user = {
-      id: user.user_id,
+      id: user.id,
       email: user.email,
       name: user.name,
       accessToken: token,

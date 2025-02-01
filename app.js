@@ -6,6 +6,7 @@ import session from "express-session";
 import authRoutes from "./src/routes/authRoutes.js";
 // import profileRoutes from "./src/routes/profileRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
+import jobRoutes from "./src/routes/jobRoutes.js";
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use(
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api", jobRoutes);
 // app.use("/hmnn/profile", profileRoutes);
 
 export default app;
