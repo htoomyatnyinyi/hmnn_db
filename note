@@ -1,0 +1,15 @@
+GET /users - Get all users
+
+POST /users - Create a new user
+
+GET /jobs - Get all job posts
+
+POST /jobs - Create a new job post
+
+GET /jobs/:id/responsibilities - Get responsibilities for a specific job post
+
+POST /jobs/:id/responsibilities - Add a responsibility to a job post
+
+GET /users/:id/resumes - Get resumes for a specific user
+
+POST /users/:id/resumes - Add a resume for a specific user

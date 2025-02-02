@@ -1,0 +1,367 @@
+// import express from "express";
+// import bodyParser from "body-parser";
+// import cors from "cors";
+// // import pool from "./db.js"; // Import the pool from your db.js file
+// import pool from "./src/config/databases/db.js";
+
+// const app = express();
+// const PORT = process.env.PORT || 5000;
+
+// // Middleware
+// app.use(cors());
+// app.use(bodyParser.json());
+
+// // Routes
+// app.get("/", (req, res) => {
+//   res.send("Welcome to the Job Portal API!");
+// });
+
+// // User Account Routes
+// app.get("/users", async (req, res) => {
+//   try {
+//     const [rows] = await pool.query("SELECT * FROM userAccount");
+//     res.json(rows);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// app.post("/users", async (req, res) => {
+//   const {
+//     username,
+//     email,
+//     phone,
+//     password,
+//     first_name,
+//     last_name,
+//     gender,
+//     date_of_birth,
+//     location,
+//     bios,
+//     profile_img,
+//     cover_img,
+//   } = req.body;
+
+//   try {
+//     const [result] = await pool.query(
+//       "INSERT INTO userAccount (username, email, phone, password, first_name, last_name, gender, date_of_birth, location, bios, profile_img, cover_img) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+//       [
+//         username,
+//         email,
+//         phone,
+//         password,
+//         first_name,
+//         last_name,
+//         gender,
+//         date_of_birth,
+//         location,
+//         bios,
+//         profile_img,
+//         cover_img,
+//       ]
+//     );
+//     res.status(201).json({ id: result.insertId, ...req.body });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // Job Post Routes
+// app.get("/jobs", async (req, res) => {
+//   try {
+//     const [rows] = await pool.query("SELECT * FROM jobPost");
+//     res.json(rows);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// app.post("/jobs", async (req, res) => {
+//   const {
+//     title,
+//     description,
+//     salary,
+//     location,
+//     address,
+//     company_name,
+//     license,
+//     category,
+//     company_logo,
+//     post_img,
+//     employmentType,
+//   } = req.body;
+
+//   try {
+//     const [result] = await pool.query(
+//       "INSERT INTO jobPost (title, description, salary, location, address, company_name, license, category, company_logo, post_img, employmentType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+//       [
+//         title,
+//         description,
+//         salary,
+//         location,
+//         address,
+//         company_name,
+//         license,
+//         category,
+//         company_logo,
+//         post_img,
+//         employmentType,
+//       ]
+//     );
+//     res.status(201).json({ id: result.insertId, ...req.body });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // Job Responsibilities Routes
+// app.get("/jobs/:id/responsibilities", async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const [rows] = await pool.query(
+//       "SELECT * FROM jobResponsibilities WHERE post_id = ?",
+//       [id]
+//     );
+//     res.json(rows);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// app.post("/jobs/:id/responsibilities", async (req, res) => {
+//   const { id } = req.params;
+//   const { responsibility } = req.body;
+
+//   try {
+//     const [result] = await pool.query(
+//       "INSERT INTO jobResponsibilities (post_id, responsibility) VALUES (?, ?)",
+//       [id, responsibility]
+//     );
+//     res.status(201).json({ id: result.insertId, post_id: id, responsibility });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // Job Requirements Routes
+// app.get("/jobs/:id/requirements", async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const [rows] = await pool.query(
+//       "SELECT * FROM jobRequirements WHERE post_id = ?",
+//       [id]
+//     );
+//     res.json(rows);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// app.post("/jobs/:id/requirements", async (req, res) => {
+//   const { id } = req.params;
+//   const { requirement } = req.body;
+
+//   try {
+//     const [result] = await pool.query(
+//       "INSERT INTO jobRequirements (post_id, requirement) VALUES (?, ?)",
+//       [id, requirement]
+//     );
+//     res.status(201).json({ id: result.insertId, post_id: id, requirement });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // User Resume Routes
+// app.get("/users/:id/resumes", async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const [rows] = await pool.query(
+//       "SELECT * FROM userResume WHERE user_id = ?",
+//       [id]
+//     );
+//     res.json(rows);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// app.post("/users/:id/resumes", async (req, res) => {
+//   const { id } = req.params;
+//   const { file_path, file_name, file_type } = req.body;
+
+//   try {
+//     const [result] = await pool.query(
+//       "INSERT INTO userResume (user_id, file_path, file_name, file_type) VALUES (?, ?, ?, ?)",
+//       [id, file_path, file_name, file_type]
+//     );
+//     res.status(201).json({ id: result.insertId, user_id: id, ...req.body });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // File Resume Routes
+// app.get("/resumes", async (req, res) => {
+//   try {
+//     const [rows] = await pool.query("SELECT * FROM fileResume");
+//     res.json(rows);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// app.post("/resumes", async (req, res) => {
+//   const { personal_info, summary, experience, skills, education } = req.body;
+
+//   try {
+//     const [result] = await pool.query(
+//       "INSERT INTO fileResume (personal_info, summary, experience, skills, education) VALUES (?, ?, ?, ?, ?)",
+//       [personal_info, summary, experience, skills, education]
+//     );
+//     res.status(201).json({ id: result.insertId, ...req.body });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // User Applied Job Routes
+// app.get("/users/:id/applied-jobs", async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const [rows] = await pool.query(
+//       "SELECT * FROM userAppliedJob WHERE user_id = ?",
+//       [id]
+//     );
+//     res.json(rows);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// app.post("/users/:id/applied-jobs", async (req, res) => {
+//   const { id } = req.params;
+//   const { post_id, resume_id, status } = req.body;
+
+//   try {
+//     const [result] = await pool.query(
+//       "INSERT INTO userAppliedJob (user_id, post_id, resume_id, status) VALUES (?, ?, ?, ?)",
+//       [id, post_id, resume_id, status]
+//     );
+//     res.status(201).json({ id: result.insertId, user_id: id, ...req.body });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // User Saved Job Routes
+// app.get("/users/:id/saved-jobs", async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const [rows] = await pool.query(
+//       "SELECT * FROM userSavedJob WHERE user_id = ?",
+//       [id]
+//     );
+//     res.json(rows);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// app.post("/users/:id/saved-jobs", async (req, res) => {
+//   const { id } = req.params;
+//   const { post_id } = req.body;
+
+//   try {
+//     const [result] = await pool.query(
+//       "INSERT INTO userSavedJob (user_id, post_id) VALUES (?, ?)",
+//       [id, post_id]
+//     );
+//     res.status(201).json({ id: result.insertId, user_id: id, post_id });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// export default app;
+
+// Fetch all jobs with applied status for a specific user
+const getJobs = async (req, res) => {
+  // const { user_id } = req.query;
+  const user_id = req.user.id;
+
+  try {
+    // Fetch all jobs
+    const [jobs] = await pool.query("SELECT * FROM jobPost");
+
+    // If user_id is provided, check if the user has applied for each job
+    if (user_id) {
+      const jobsWithApplicationStatus = await Promise.all(
+        jobs.map(async (job) => {
+          const [application] = await pool.query(
+            "SELECT status FROM userAppliedJob WHERE user_id = ? AND post_id = ?",
+            [user_id, job.id]
+          );
+          return {
+            ...job,
+            applied: application.length > 0,
+            application_status:
+              application.length > 0 ? application[0].status : null,
+          };
+        })
+      );
+      return res.json(jobsWithApplicationStatus);
+    }
+
+    // If no user_id is provided, return all jobs without application status
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Create a new job post
+const createJob = async (req, res) => {
+  const {
+    title,
+    description,
+    salary,
+    location,
+    address,
+    company_name,
+    license,
+    category,
+    company_logo,
+    post_img,
+    employmentType,
+  } = req.body;
+
+  try {
+    const [result] = await pool.query(
+      "INSERT INTO jobPost (title, description, salary, location, address, company_name, license, category, company_logo, post_img, employmentType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [
+        title,
+        description,
+        salary,
+        location,
+        address,
+        company_name,
+        license,
+        category,
+        company_logo,
+        post_img,
+        employmentType,
+      ]
+    );
+    res.status(201).json({ id: result.insertId, ...req.body });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export { jobs, createNewJob, job, getJobs, createJob };

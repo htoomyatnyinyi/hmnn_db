@@ -2,11 +2,13 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import session from "express-session";
+import bodyParser from "body-parser";
 
-import authRoutes from "./src/routes/authRoutes.js";
+// import authRoutes from "./src/routes/authRoutes.js";
 // import profileRoutes from "./src/routes/profileRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import jobRoutes from "./src/routes/jobRoutes.js";
+import applicationRoutes from "./src/routes/applicationRoutes.js";
 
 const app = express();
 
@@ -34,35 +36,22 @@ app.use(
   })
 );
 
+// Use body-parser middleware to parse JSON
+app.use(bodyParser.json());
+
+// Error handling for invalid JSON
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
+    return res.status(400).json({ message: "Invalid JSON payload" });
+  }
+  next();
+});
+
 // Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
+// app.use("/auth", authRoutes);
+app.use("/api", userRoutes);
 app.use("/api", jobRoutes);
+app.use("/api", applicationRoutes);
 // app.use("/hmnn/profile", profileRoutes);
 
 export default app;
-
-// import express from "express";
-// import cors from "cors";
-
-// import authRoutes from "./src/routes/authRoutes.js";
-// import userRoutes from "./src/routes/userRoutes.js";
-
-// const server = express();
-
-// // Middleware
-// server.use(cors());
-// server.use(express.json());
-
-// // Routes
-// server.use("/api/auth", authRoutes);
-// server.use("/api/users", userRoutes);
-// // app.use("/api/jobs", jobRoutes);
-// // app.use("/api/profile", profileRoutes);
-// // app.use("/api/applications", applicationRoutes);
-
-// export default server;
-
-// // const jobRoutes = require('./routes/jobRoutes');
-// // const profileRoutes = require('./routes/profileRoutes');
-// // const applicationRoutes = require('./routes/applicationRoutes');
