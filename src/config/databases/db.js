@@ -73,7 +73,7 @@ const initializeDatabase = async () => {
         requirement TEXT NOT NULL,
         FOREIGN KEY (post_id) REFERENCES jobPost(id) ON DELETE CASCADE
       )`,
-      `CREATE TABLE IF NOT EXISTS userResume (
+      `CREATE TABLE IF NOT EXISTS fileResume (
         id INT AUTO_INCREMENT PRIMARY KEY,
         user_id INT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES userAccount(id),
@@ -83,7 +83,7 @@ const initializeDatabase = async () => {
         uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )`,
-      `CREATE TABLE IF NOT EXISTS fileResume (
+      `CREATE TABLE IF NOT EXISTS profileResume (
         id INT AUTO_INCREMENT PRIMARY KEY,
         personal_info JSON NOT NULL,
         summary TEXT,
@@ -99,7 +99,7 @@ const initializeDatabase = async () => {
         resume_id INT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES userAccount(id),
         FOREIGN KEY (post_id) REFERENCES jobPost(id),
-        FOREIGN KEY (resume_id) REFERENCES userResume(id),
+        FOREIGN KEY (resume_id) REFERENCES profileResume(id),
         status ENUM('pending', 'interviewed', 'rejected', 'offered') NOT NULL DEFAULT 'pending',
         applied BOOLEAN DEFAULT TRUE,
         applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

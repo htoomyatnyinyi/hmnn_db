@@ -10,8 +10,6 @@ import isAuthenticated from "../middleware/Authenticated.js";
 
 const router = express.Router();
 
-// router.get("/me", isAuthenticated, profile);
-// router.get("/all", isAuthenticated, users);
 router.delete("/me", isAuthenticated, deleteAccount);
 router.patch("/me", isAuthenticated, updateProfile);
 
@@ -20,7 +18,6 @@ router.post("/register", registerUser);
 
 // POST /users/login - Login a user
 router.post("/login", loginUser);
-
 
 // Logout route
 router.post("/logout", (req, res) => {

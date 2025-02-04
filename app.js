@@ -9,6 +9,7 @@ import bodyParser from "body-parser";
 import userRoutes from "./src/routes/userRoutes.js";
 import jobRoutes from "./src/routes/jobRoutes.js";
 import applicationRoutes from "./src/routes/applicationRoutes.js";
+import fileResumeRoutes from "./src/routes/fileResumeRoutes.js";
 
 const app = express();
 
@@ -52,6 +53,9 @@ app.use((err, req, res, next) => {
 app.use("/api", userRoutes);
 app.use("/api", jobRoutes);
 app.use("/api", applicationRoutes);
+app.use("/api", fileResumeRoutes);
 // app.use("/hmnn/profile", profileRoutes);
+
+app.use("/uploads", express.static("uploads")); // Serve uploaded files
 
 export default app;

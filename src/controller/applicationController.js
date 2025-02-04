@@ -125,6 +125,11 @@ const deleteAppliedJob = async (req, res) => {
   }
 };
 
+// const {user_id, post_id, status} = req.body;
+// const resumeIdQuery = `SELECT id FROM profileResume WHERE user_id = ? ORDER BY created_at DESC LIMIT 1`;
+// const query = `INSERT INTO userAppliedJob (user_id, post_id, resume_id, status) VALUES (1, 123, (SELECT id FROM profileResume WHERE user_id = 1 ORDER BY created_at DESC LIMIT 1),'pending')`;
+// const params = [1, 123, 1, "pending"];
+
 export {
   applyForJob,
   getAppliedJobs,

@@ -3,9 +3,10 @@ POST http://localhost:8080/api/register
 Content-Type: application/json
 
 {
-    "username":"e3dr",
-    "email": "abcfd@gmail.com",
-    "password": "123456"
+    "username": "4",
+    "email": "haf3@mgial.com",
+    "phone": "234",
+    "password": "12345678"
 }
 
 ###
@@ -13,14 +14,29 @@ POST http://localhost:8080/api/login
 Content-Type: application/json
 
 {
-    "usernameOrEmail": "abcfd@gmail.com",
-    "password": "123456"
+    "identifier": "fawelfj",
+    "password": "12345678"
+}
+
+
+###
+POST http://localhost:8080/api/upload 
+Content-Type: multipart/form-data; 
+
+{
+  "user_id": 1,
+  "file": <"file@//Users/htoomyatnyinyi/Downloads/Rockstar-Developer-2025.pdf">
 }
 ###
+    # "file": "C:\\Users\\User\\Desktop\\resume.pdf"
+    # "identifier": "abcfd@gmail.com",
 POST http://localhost:8080/api/logout
 
 ###
 GET http://localhost:8080/api/applied-jobs
+###
+
+DELETE http://localhost:8080/api/delete-job/5
 ###
 POST  http://localhost:8080/api/apply-job
 Content-Type: application/json
@@ -30,43 +46,54 @@ Content-Type: application/json
     "resume_id": "1",
 }
 ###
-GET http://localhost:8080/api/job/2
+GET http://localhost:8080/api/job/7
 
 ###
-PATCH http://localhost:8080/api/job/2
+PATCH http://localhost:8080/api/job/7
 Content-Type: application/json
 
 {
-    "title": "test title 30",
-    "description": "blah .. blah descriptions",
-    "salary": "400000"
+    "title": "Facility Techician",
+    "responsibilities": [
+        "Test 1",
+        "Test 2"
+    ],
+    "requirements": [
+        "Test 1",
+        "Test 2"]
 }
 ###
 GET http://localhost:8080/api/jobs
 ###
-POST http://localhost:8080/api/create 
+GET http://localhost:8080/api/job/8
+###
+POST http://localhost:8080/api/create-job
 Content-Type: application/json
 
 {
-  "title": "test title 1",
-  "description": "blah .. blah descriptions",
-  "salary": "400000",
-  "location": "Yangon", 
-  "address": "123 Main St", 
-  "company_name": "Google", 
+  "title": "Facility Techician",
+  "description": "this is a descriptions",
+  "salary": "600000",
+  "location": "Mawlamyine", 
+  "address": "123 efafMain St", 
+  "company_name": "HMNN", 
   "license": "Company License", 
   "category": "Technology", 
   "company_logo": "logo.png", 
   "post_img": "image.jpg", 
   "employmentType": "Full-time", 
   "responsibilities": [
-    "Develop",
-    "Test",
-    "Deploy"
+    "Efai",
+    "Fawef",
+    "Forwarded",
+    "faieklfla"
   ],
   "requirements": [
+    "NOte 1",
+    "REqu 2",
     "Java",
     "Python",
-    "JavaScript"
+    "C++",
+    "C#"
   ]
 }

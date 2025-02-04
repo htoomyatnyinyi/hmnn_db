@@ -21,7 +21,7 @@ router.get("/job/:id", getJobById);
 router.patch("/job/:id", updateJob);
 
 // DELETE /job/:id - Delete a specific job by ID
-router.delete("/job/:id", deleteJob);
+router.delete("/delete-job/:id", deleteJob);
 
 // POST /jobs - Create a new job post
 router.post("/create-job", createJob);

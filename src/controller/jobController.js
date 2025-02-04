@@ -63,53 +63,82 @@ const createJob = async (req, res) => {
 
 const getJobs = async (req, res) => {
   try {
-    const [rows] = await pool.query(`
-      SELECT 
-        jp.*, 
-        GROUP_CONCAT(jr.responsibility SEPARATOR ', ') AS responsibilities, 
-        GROUP_CONCAT(jrq.requirement SEPARATOR ', ') AS requirements 
-      FROM 
-        jobPost jp
-      LEFT JOIN 
-        jobResponsibilities jr ON jp.id = jr.post_id
-      LEFT JOIN 
-        jobRequirements jrq ON jp.id = jrq.post_id
-      GROUP BY 
-        jp.id
-    `);
-    res.status(200).json(rows);
+    // Fetch job posts
+    const [jobs] = await pool.query(`SELECT * FROM jobPost`);
+
+    // Fetch responsibilities and requirements for each job
+    for (const job of jobs) {
+      const [responsibilities] = await pool.query(
+        `SELECT responsibility FROM jobResponsibilities WHERE post_id = ?`,
+        [job.id]
+      );
+      const [requirements] = await pool.query(
+        `SELECT requirement FROM jobRequirements WHERE post_id = ?`,
+        [job.id]
+      );
+
+      // Add responsibilities and requirements as arrays to the job object
+      job.responsibilities = responsibilities.map((r) => r.responsibility);
+      job.requirements = requirements.map((r) => r.requirement);
+    }
+
+    res.status(200).json(jobs);
   } catch (error) {
     console.error("Error fetching jobs:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+// const getJobs = async (req, res) => {
+//   try {
+//     const [rows] = await pool.query(`
+//       SELECT
+//         jp.*,
+//         GROUP_CONCAT(jr.responsibility SEPARATOR ', ') AS responsibilities,
+//         GROUP_CONCAT(jrq.requirement SEPARATOR ', ') AS requirements
+//       FROM
+//         jobPost jp
+//       LEFT JOIN
+//         jobResponsibilities jr ON jp.id = jr.post_id
+//       LEFT JOIN
+//         jobRequirements jrq ON jp.id = jrq.post_id
+//       GROUP BY
+//         jp.id
+//     `);
+//     res.status(200).json(rows);
+//   } catch (error) {
+//     console.error("Error fetching jobs:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
 
 const getJobById = async (req, res) => {
   try {
     const { id } = req.params;
-    const [[job]] = await pool.query(
-      `
-      SELECT 
-        jp.*, 
-        GROUP_CONCAT(jr.responsibility SEPARATOR ', ') AS responsibilities, 
-        GROUP_CONCAT(jrq.requirement SEPARATOR ', ') AS requirements 
-      FROM 
-        jobPost jp
-      LEFT JOIN 
-        jobResponsibilities jr ON jp.id = jr.post_id
-      LEFT JOIN 
-        jobRequirements jrq ON jp.id = jrq.post_id
-      WHERE 
-        jp.id = ?
-      GROUP BY 
-        jp.id
-    `,
-      [id]
-    );
+
+    // Fetch job post
+    const [[job]] = await pool.query(`SELECT * FROM jobPost WHERE id = ?`, [
+      id,
+    ]);
 
     if (!job) {
       return res.status(404).json({ error: "Job not found" });
     }
+
+    // Fetch responsibilities
+    const [responsibilities] = await pool.query(
+      `SELECT responsibility FROM jobResponsibilities WHERE post_id = ?`,
+      [id]
+    );
+
+    // Fetch requirements
+    const [requirements] = await pool.query(
+      `SELECT requirement FROM jobRequirements WHERE post_id = ?`,
+      [id]
+    );
+
+    // Add responsibilities and requirements as arrays to the job object
+    job.responsibilities = responsibilities.map((r) => r.responsibility);
+    job.requirements = requirements.map((r) => r.requirement);
 
     res.status(200).json(job);
   } catch (error) {
@@ -117,6 +146,39 @@ const getJobById = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+// const getJobById = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const [[job]] = await pool.query(
+//       `
+//       SELECT
+//         jp.*,
+//         GROUP_CONCAT(jr.responsibility SEPARATOR ', ') AS responsibilities,
+//         GROUP_CONCAT(jrq.requirement SEPARATOR ', ') AS requirements
+//       FROM
+//         jobPost jp
+//       LEFT JOIN
+//         jobResponsibilities jr ON jp.id = jr.post_id
+//       LEFT JOIN
+//         jobRequirements jrq ON jp.id = jrq.post_id
+//       WHERE
+//         jp.id = ?
+//       GROUP BY
+//         jp.id
+//     `,
+//       [id]
+//     );
+
+//     if (!job) {
+//       return res.status(404).json({ error: "Job not found" });
+//     }
+
+//     res.status(200).json(job);
+//   } catch (error) {
+//     console.error("Error fetching job:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
 
 const updateJob = async (req, res) => {
   console.log(req.body, "at updateJob");
@@ -138,48 +200,96 @@ const updateJob = async (req, res) => {
       requirements,
     } = req.body;
 
-    // Update jobPost table
-    await pool.query(
-      `UPDATE jobPost 
-       SET title = ?, description = ?, salary = ?, location = ?, address = ?, company_name = ?, 
-           license = ?, category = ?, company_logo = ?, post_img = ?, employmentType = ? 
-       WHERE id = ?`,
-      [
-        title,
-        description,
-        salary,
-        location,
-        address,
-        company_name,
-        license,
-        category,
-        company_logo,
-        post_img,
-        employmentType,
-        id,
-      ]
-    );
+    // Dynamically construct the SQL query for updating jobPost
+    let updateQuery = `UPDATE jobPost SET `;
+    const updateParams = [];
+    const fieldsToUpdate = [];
 
-    // Delete existing responsibilities
-    await pool.query(`DELETE FROM jobResponsibilities WHERE post_id = ?`, [id]);
-
-    // Insert updated responsibilities
-    for (const responsibility of responsibilities) {
-      await pool.query(
-        `INSERT INTO jobResponsibilities (post_id, responsibility) VALUES (?, ?)`,
-        [id, responsibility]
-      );
+    if (title !== undefined) {
+      fieldsToUpdate.push("title = ?");
+      updateParams.push(title);
+    }
+    if (description !== undefined) {
+      fieldsToUpdate.push("description = ?");
+      updateParams.push(description);
+    }
+    if (salary !== undefined) {
+      fieldsToUpdate.push("salary = ?");
+      updateParams.push(salary);
+    }
+    if (location !== undefined) {
+      fieldsToUpdate.push("location = ?");
+      updateParams.push(location);
+    }
+    if (address !== undefined) {
+      fieldsToUpdate.push("address = ?");
+      updateParams.push(address);
+    }
+    if (company_name !== undefined) {
+      fieldsToUpdate.push("company_name = ?");
+      updateParams.push(company_name);
+    }
+    if (license !== undefined) {
+      fieldsToUpdate.push("license = ?");
+      updateParams.push(license);
+    }
+    if (category !== undefined) {
+      fieldsToUpdate.push("category = ?");
+      updateParams.push(category);
+    }
+    if (company_logo !== undefined) {
+      fieldsToUpdate.push("company_logo = ?");
+      updateParams.push(company_logo);
+    }
+    if (post_img !== undefined) {
+      fieldsToUpdate.push("post_img = ?");
+      updateParams.push(post_img);
+    }
+    if (employmentType !== undefined) {
+      fieldsToUpdate.push("employmentType = ?");
+      updateParams.push(employmentType);
     }
 
-    // Delete existing requirements
-    await pool.query(`DELETE FROM jobRequirements WHERE post_id = ?`, [id]);
+    // If no fields are provided to update, return an error
+    if (fieldsToUpdate.length === 0) {
+      return res.status(400).json({ error: "No fields provided for update" });
+    }
 
-    // Insert updated requirements
-    for (const requirement of requirements) {
-      await pool.query(
-        `INSERT INTO jobRequirements (post_id, requirement) VALUES (?, ?)`,
-        [id, requirement]
-      );
+    // Add the WHERE clause to the query
+    updateQuery += fieldsToUpdate.join(", ") + " WHERE id = ?";
+    updateParams.push(id);
+
+    // Execute the dynamic update query
+    await pool.query(updateQuery, updateParams);
+
+    // Update responsibilities if provided
+    if (responsibilities !== undefined) {
+      // Delete existing responsibilities
+      await pool.query(`DELETE FROM jobResponsibilities WHERE post_id = ?`, [
+        id,
+      ]);
+
+      // Insert updated responsibilities
+      for (const responsibility of responsibilities) {
+        await pool.query(
+          `INSERT INTO jobResponsibilities (post_id, responsibility) VALUES (?, ?)`,
+          [id, responsibility]
+        );
+      }
+    }
+
+    // Update requirements if provided
+    if (requirements !== undefined) {
+      // Delete existing requirements
+      await pool.query(`DELETE FROM jobRequirements WHERE post_id = ?`, [id]);
+
+      // Insert updated requirements
+      for (const requirement of requirements) {
+        await pool.query(
+          `INSERT INTO jobRequirements (post_id, requirement) VALUES (?, ?)`,
+          [id, requirement]
+        );
+      }
     }
 
     res.status(200).json({ message: "Job updated successfully" });
@@ -188,6 +298,77 @@ const updateJob = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+// const updateJob = async (req, res) => {
+//   console.log(req.body, "at updateJob");
+//   try {
+//     const { id } = req.params;
+//     const {
+//       title,
+//       description,
+//       salary,
+//       location,
+//       address,
+//       company_name,
+//       license,
+//       category,
+//       company_logo,
+//       post_img,
+//       employmentType,
+//       responsibilities,
+//       requirements,
+//     } = req.body;
+
+//     // Update jobPost table
+//     await pool.query(
+//       `UPDATE jobPost
+//        SET title = ?, description = ?, salary = ?, location = ?, address = ?, company_name = ?,
+//            license = ?, category = ?, company_logo = ?, post_img = ?, employmentType = ?
+//        WHERE id = ?`,
+//       [
+//         title,
+//         description,
+//         salary,
+//         location,
+//         address,
+//         company_name,
+//         license,
+//         category,
+//         company_logo,
+//         post_img,
+//         employmentType,
+//         id,
+//       ]
+//     );
+
+//     // Delete existing responsibilities
+//     await pool.query(`DELETE FROM jobResponsibilities WHERE post_id = ?`, [id]);
+
+//     // Insert updated responsibilities
+//     for (const responsibility of responsibilities) {
+//       await pool.query(
+//         `INSERT INTO jobResponsibilities (post_id, responsibility) VALUES (?, ?)`,
+//         [id, responsibility]
+//       );
+//     }
+
+//     // Delete existing requirements
+//     await pool.query(`DELETE FROM jobRequirements WHERE post_id = ?`, [id]);
+
+//     // Insert updated requirements
+//     for (const requirement of requirements) {
+//       await pool.query(
+//         `INSERT INTO jobRequirements (post_id, requirement) VALUES (?, ?)`,
+//         [id, requirement]
+//       );
+//     }
+
+//     res.status(200).json({ message: "Job updated successfully" });
+//   } catch (error) {
+//     console.error("Error updating job:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
 
 const deleteJob = async (req, res) => {
   try {
